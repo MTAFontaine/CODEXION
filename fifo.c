@@ -1,15 +1,22 @@
-typedef struct queue_node_s {
-    int coder_id;              
-    struct queue_node_s* next; 
-} queue_node_t;
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fifo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/10 13:55:45 by mafontai          #+#    #+#             */
+/*   Updated: 2026/03/10 13:56:16 by mafontai         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-typedef struct fifo_queue_s {
-    queue_node_t* head; // The front of the queue (the first one to ask)
-    queue_node_t* tail; // The back of the queue (the last one to ask)
-} fifo_queue_t;
+#include "codexion.h"
 
-void append(fifo_queue_t* queue, int coder_id){
-	queue_node_t* new_node = malloc(sizeof(queue_node_t));
+void	append(t_fifo_queue	*queue, int coder_id)
+{
+	t_queue_node	*new_node;
+
+	new_node = malloc(sizeof(t_queue_node));
 	if (!new_node)
 		exit(-1);
 	new_node->coder_id = coder_id;
@@ -20,19 +27,17 @@ void append(fifo_queue_t* queue, int coder_id){
 		queue->head = new_node;
 		queue->tail = new_node;
 	}
-	else 
+	else
 	{
 		queue->tail->next = new_node;
 		queue->tail = new_node;
 	}
 }
 
-int peek(fifo_queue_t* queue)
+int	peek(t_fifo_queue	*queue)
 {
 	if (queue->head == NULL)
-	{
 		return (-1);
-	}
-	return queue->head->coder_id;
+	return (queue->head->coder_id);
 }
 
