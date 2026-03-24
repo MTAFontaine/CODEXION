@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   fifo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 13:55:45 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/19 10:22:54 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/24 15:58:37 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <time.h>
 
 void	append(t_fifo_queue	*queue, int coder_id)
 {
@@ -54,24 +55,38 @@ int	peek(t_fifo_queue	*queue)
 	return (queue->head->coder_id);
 }
 
-void get_dongle(t_dongle *d, int coder_id)
+void	get_dongle(t_dongle *d, t_coders coder)
 {
-	pthread_mutex_lock(&d->mutex);
-	append(&d->fifo, coder_id);
+	long long		now;
+	struct timespec	ts;
 
-	while (d->used || peek(&d->fifo) != coder_id)
-		pthread_cond_wait(&d->cond, &d->mutex);
-	
+	pthread_mutex_lock(&d->mutex);
+	append(&d->fifo, coder.id);
+	while (d->used || peek(&d->fifo) != coder.id
+		|| d->available_time > get_now_in_ms())
+	{
+		now = get_now_in_ms();
+		if (!d->used && peek(&d->fifo) == coder.id && d->available_time > now)
+		{
+			ts.tv_sec = d->available_time / 1000;
+			ts.tv_nsec = (d->available_time % 1000) * 1000000;
+			pthread_cond_timedwait(&d->cond, &d->mutex, &ts);
+		}
+		else
+			pthread_cond_wait(&d->cond, &d->mutex);
+	}
 	d->used = 1;
-	printf("\nCoder %i acquired dongle %i\n", coder_id, d->id);
+	printf("\n%lld %i has taken a dongle\n",
+		(get_now_in_ms() - coder.sim->start), coder.id);
 	pop_head(&d->fifo);
 	pthread_mutex_unlock(&d->mutex);
 }
 
-void release_dongle(t_dongle *d)
+void	release_dongle(t_dongle *d)
 {
 	pthread_mutex_lock(&d->mutex);
 	d->used = 0;
+	d->available_time = get_now_in_ms() + d->cooldown_time;
 	pthread_cond_broadcast(&d->cond);
 	pthread_mutex_unlock(&d->mutex);
 }

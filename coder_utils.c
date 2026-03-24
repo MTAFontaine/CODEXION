@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:37:53 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/20 12:52:47 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/24 15:58:55 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ long long	get_now_in_ms(void)
 void	*coder_routine(void *arg)
 {
 	t_coders	*coder;
-	int i;
+	int			i;
 
 	i = 0;
 	if (!arg)
@@ -44,22 +44,31 @@ void	*coder_routine(void *arg)
 
 void	compile(t_coders coder)
 {
-	long long	ms_now;
-	long long	target;
-	long long	t_compile;
+	t_dongle		*first;
+	t_dongle		*second;
+	long long		ms_now;
+	long long		target;
+	long long		t_compile;
 
-	get_dongle(coder.left_dongle, coder.id);
-	get_dongle(coder.right_dongle, coder.id);
+	first = coder.left_dongle;
+	second = coder.right_dongle;
+	if (first->id > second->id)
+	{
+		first = coder.right_dongle;
+		second = coder.left_dongle;
+	}
+	get_dongle(first, coder);
+	get_dongle(second, coder);
 	t_compile = coder.sim->time_to_compile_ms;
 	ms_now = get_now_in_ms();
 	target = ms_now + t_compile;
 
-	printf("\n%i Started compiling...\n", coder.id);
+	printf("\n%lld %i is compiling\n",
+		(get_now_in_ms() - coder.sim->start), coder.id);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
-	printf("\n%d Compiled!\n", coder.id);
-	release_dongle(coder.left_dongle);
-	release_dongle(coder.right_dongle);
+	release_dongle(second);
+	release_dongle(first);
 }
 
 void	refactor(t_coders coder)
@@ -72,10 +81,10 @@ void	refactor(t_coders coder)
 	ms_now = get_now_in_ms();
 	target = ms_now + t_refactor;
 
-	printf("\n%d Started refactoring...\n", coder.id);
+	printf("\n%lld %d is refactoring\n",
+		(get_now_in_ms() - coder.sim->start), coder.id);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
-	printf("\n%d refactored!\n", coder.id);
 }
 
 void	debug(t_coders coder)
@@ -87,8 +96,8 @@ void	debug(t_coders coder)
 	t_debug = coder.sim->time_to_debug_ms;
 	ms_now = get_now_in_ms();
 	target = ms_now + t_debug;
-	printf("\n%d Started debugging...\n", coder.id);
+	printf("\n%lld %d is debugging\n",
+		(get_now_in_ms() - coder.sim->start), coder.id);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
-	printf("\n%d debugged!\n", coder.id);
 }

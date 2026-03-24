@@ -1,8 +1,8 @@
 NAME = codexion
-CC = cc
+CC = cc -fsanitize=address
 CFLAGS = -Wall -Wextra -Werror -pthread
 
-SRCS = main.c fifo.c process.c coder_utils.c
+SRCS = main.c main_utils.c fifo.c coder_utils.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
