@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:37:53 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/10 13:59:10 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/20 12:52:47 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,20 @@ long long	get_now_in_ms(void)
 void	*coder_routine(void *arg)
 {
 	t_coders	*coder;
-	long		t_compile;
-	long		t_debug;
-	long		t_refactor;
+	int i;
 
+	i = 0;
 	if (!arg)
 		return (NULL);
 	coder = (t_coders *)arg;
-	compile(*coder);
-	debug(*coder);
-	refactor(*coder);
+	while (coder->compile_count < coder->sim->number_of_compiles_required)
+	{
+		compile(*coder);
+		coder->compile_count += 1;
+		debug(*coder);
+		refactor(*coder);
+		i++;
+	}
 	return (NULL);
 }
 
@@ -44,16 +48,18 @@ void	compile(t_coders coder)
 	long long	target;
 	long long	t_compile;
 
-	append(&coder.left_dongle->fifo, coder.id);
-	append(&coder.right_dongle->fifo, coder.id);
+	get_dongle(coder.left_dongle, coder.id);
+	get_dongle(coder.right_dongle, coder.id);
 	t_compile = coder.sim->time_to_compile_ms;
 	ms_now = get_now_in_ms();
 	target = ms_now + t_compile;
 
-	printf("\n%lu Started compiling...\n", coder.id);
+	printf("\n%i Started compiling...\n", coder.id);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
 	printf("\n%d Compiled!\n", coder.id);
+	release_dongle(coder.left_dongle);
+	release_dongle(coder.right_dongle);
 }
 
 void	refactor(t_coders coder)

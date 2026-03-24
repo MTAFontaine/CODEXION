@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:30:52 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/10 13:57:15 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/19 10:18:37 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ typedef struct sim_s
 typedef struct dongle_s
 {
 	pthread_mutex_t	mutex;
+	pthread_cond_t cond;
 	int				id;
 	int				used;
 	int				cooldown_time;
@@ -68,6 +69,9 @@ void		*coder_routine(void *arg);
 long long	get_now_in_ms(void);
 
 void		append(t_fifo_queue	*queue, int coder_id);
+void		pop_head(t_fifo_queue	*queue);
 int			peek(t_fifo_queue	*queue);
+void		get_dongle(t_dongle *d, int coder_id);
+void		release_dongle(t_dongle *d);
 
 #endif

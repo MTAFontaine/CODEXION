@@ -1,21 +1,14 @@
-# Makefile for Codexion
-
 NAME = codexion
-CC = gcc
+CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
-SRCS_DIR = coders
-SRCS = $(wildcard $(SRCS_DIR)/*.c)
-OBJS = $(SRCS:.c=.o)
 
-.PHONY: all clean fclean re
+SRCS = main.c fifo.c process.c coder_utils.c
+OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
 	rm -f $(OBJS)
@@ -24,3 +17,5 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+.PHONY: all clean fclean re

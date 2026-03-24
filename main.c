@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:24:05 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/10 13:42:58 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/19 10:17:53 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,19 @@ int	main(void)
 
 	coders = malloc(sizeof (t_coders) * sim.n_coders);
 	dongles = malloc(sizeof (*dongles) * sim.n_coders);
-	while (i < sim.n_coders)
+	while (i < sim.n_coders) // Initate dongles
 	{
 		pthread_mutex_init(&dongles[i].mutex, NULL);
+		pthread_cond_init(&dongles[i].cond, NULL);
 		dongles[i].id = i;
 		dongles[i].used = 0;
 		dongles[i].cooldown_time = sim.dongle_cooldown_ms;
+		dongles[i].fifo.head = NULL;
+		dongles[i].fifo.tail = NULL;
 		i++;
 	}
 	i = 0;
-	while (i < sim.n_coders)
+	while (i < sim.n_coders) // Initiate coders and launch thread
 	{
 		coders[i].id = i + 1;
 		coders[i].compile_count = 0;
