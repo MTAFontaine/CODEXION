@@ -1,5 +1,5 @@
 NAME = codexion
-CC = cc -fsanitize=address
+CC = cc 
 CFLAGS = -Wall -Wextra -Werror -pthread
 
 SRCS = main.c main_utils.c fifo.c coder_utils.c

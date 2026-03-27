@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fifo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 13:55:45 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/24 15:58:37 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/27 10:32:23 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,12 @@ void	get_dongle(t_dongle *d, t_coders coder)
 			pthread_cond_wait(&d->cond, &d->mutex);
 	}
 	d->used = 1;
-	printf("\n%lld %i has taken a dongle\n",
-		(get_now_in_ms() - coder.sim->start), coder.id);
 	pop_head(&d->fifo);
 	pthread_mutex_unlock(&d->mutex);
+	pthread_mutex_lock(&coder.sim->output_mutex);
+	printf("%lld %i has taken a dongle\n",
+		(get_now_in_ms() - coder.sim->start), coder.id);
+	pthread_mutex_unlock(&coder.sim->output_mutex);
 }
 
 void	release_dongle(t_dongle *d)

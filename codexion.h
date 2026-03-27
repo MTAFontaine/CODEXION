@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:30:52 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/24 15:54:07 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/27 10:51:58 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ typedef struct fifo_queue_s
 
 typedef struct sim_s
 {
+	pthread_mutex_t	output_mutex;
+	pthread_mutex_t stop_mutex;
 	int	n_coders;
 	long long start;
 	int	time_to_burnout_ms;
@@ -41,6 +43,8 @@ typedef struct sim_s
 	int	number_of_compiles_required;
 	int	dongle_cooldown_ms;
 	int	scheduler;
+	int stop_flag;
+	
 }	t_sim;
 
 typedef struct dongle_s
@@ -59,6 +63,7 @@ typedef struct coders_s
 	int				id;
 	pthread_t		thread;
 	int				compile_count;
+	long long 		last_compile;
 	t_sim			*sim;
 	t_dongle		*left_dongle;
 	t_dongle		*right_dongle;
@@ -76,7 +81,7 @@ int			peek(t_fifo_queue	*queue);
 void		get_dongle(t_dongle *d, t_coders coder);
 void		release_dongle(t_dongle *d);
 
-void		init_dongles(t_dongle *dongles, t_sim sim);
+void		init_dongles(t_dongle *dongles, t_sim *sim);
 void		init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders);
 
 #endif

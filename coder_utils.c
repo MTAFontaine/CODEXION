@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:37:53 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/24 15:58:55 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/27 11:02:31 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,11 @@ void	compile(t_coders coder)
 	ms_now = get_now_in_ms();
 	target = ms_now + t_compile;
 
-	printf("\n%lld %i is compiling\n",
+	coder.last_compile  = get_now_in_ms();
+	pthread_mutex_lock(&coder.sim->output_mutex);
+	printf("%lld %i is compiling\n",
 		(get_now_in_ms() - coder.sim->start), coder.id);
+	pthread_mutex_unlock(&coder.sim->output_mutex);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
 	release_dongle(second);
@@ -81,8 +84,10 @@ void	refactor(t_coders coder)
 	ms_now = get_now_in_ms();
 	target = ms_now + t_refactor;
 
-	printf("\n%lld %d is refactoring\n",
+	pthread_mutex_lock(&coder.sim->output_mutex);
+	printf("%lld %d is refactoring\n",
 		(get_now_in_ms() - coder.sim->start), coder.id);
+	pthread_mutex_unlock(&coder.sim->output_mutex);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
 }
@@ -96,8 +101,10 @@ void	debug(t_coders coder)
 	t_debug = coder.sim->time_to_debug_ms;
 	ms_now = get_now_in_ms();
 	target = ms_now + t_debug;
-	printf("\n%lld %d is debugging\n",
+	pthread_mutex_lock(&coder.sim->output_mutex);
+	printf("%lld %d is debugging\n",
 		(get_now_in_ms() - coder.sim->start), coder.id);
+	pthread_mutex_unlock(&coder.sim->output_mutex);
 	while (ms_now < target)
 		ms_now = get_now_in_ms();
 }
