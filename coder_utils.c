@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:37:53 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/27 11:02:31 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/30 15:21:37 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	compile(t_coders coder)
 	ms_now = get_now_in_ms();
 	target = ms_now + t_compile;
 
-	coder.last_compile  = get_now_in_ms();
+	coder.last_compile = get_now_in_ms();
 	pthread_mutex_lock(&coder.sim->output_mutex);
 	printf("%lld %i is compiling\n",
 		(get_now_in_ms() - coder.sim->start), coder.id);

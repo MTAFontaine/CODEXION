@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:24:05 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/27 10:51:59 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/30 15:38:30 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,13 @@ int	main(void)
 	i = 0;
 	sim.n_coders = 5;
 	sim.start = get_now_in_ms();
-	sim.time_to_burnout_ms = 700;
+	sim.time_to_burnout_ms = 7;
 	sim.time_to_compile_ms = 10;
 	sim.time_to_debug_ms = 100;
 	sim.time_to_refactor_ms = 100;
 	sim.number_of_compiles_required = 3;
 	sim.dongle_cooldown_ms = 100;
-	sim.scheduler = 1;
+	sim.scheduler = 0;
 	sim.stop_flag = 0;
 
 	coders = malloc(sizeof (t_coders) * sim.n_coders);

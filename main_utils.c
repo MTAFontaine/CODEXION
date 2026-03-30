@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/24 13:07:02 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/27 10:49:16 by marvin           ###   ########.fr       */
+/*   Updated: 2026/03/30 15:43:26 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ void	init_dongles(t_dongle *dongles, t_sim *sim)
 		dongles[i].used = 0;
 		dongles[i].cooldown_time = sim->dongle_cooldown_ms;
 		dongles[i].available_time = 0;
-		dongles[i].fifo.head = NULL;
-		dongles[i].fifo.tail = NULL;
+		dongles[i].queue.head = NULL;
+		dongles[i].queue.tail = NULL;
 		i++;
 	}
 }
