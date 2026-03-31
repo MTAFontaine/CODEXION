@@ -6,18 +6,11 @@
 /*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 13:55:45 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/30 15:44:32 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/31 09:45:42 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <time.h>
-
-static int	is_before(long long deadline_ms, int coder_id, t_queue_node *node)
-{
-	return (deadline_ms < node->deadline_ms
-		|| (deadline_ms == node->deadline_ms && coder_id < node->coder_id));
-}
 
 void	append_fifo(t_queue	*queue, int coder_id, long long deadline_ms)
 {
@@ -71,40 +64,24 @@ void	prepend_edf(t_queue *queue, int coder_id, long long deadline_ms)
 		queue->tail = new_node;
 }
 
-void	get_dongle(t_dongle *d, t_coders coder)
+int	peek(t_queue	*queue)
 {
-	long long		now;
-	struct timespec	ts;
-
-	pthread_mutex_lock(&d->mutex);
-	scheduler_enqueue(d, coder);
-	while (d->used || peek(&d->queue) != coder.id
-		|| d->available_time > get_now_in_ms())
-	{
-		now = get_now_in_ms();
-		if (!d->used && peek(&d->queue) == coder.id && d->available_time > now)
-		{
-			ts.tv_sec = d->available_time / 1000;
-			ts.tv_nsec = (d->available_time % 1000) * 1000000;
-			pthread_cond_timedwait(&d->cond, &d->mutex, &ts);
-		}
-		else
-			pthread_cond_wait(&d->cond, &d->mutex);
-	}
-	d->used = 1;
-	pop_head(&d->queue);
-	pthread_mutex_unlock(&d->mutex);
-	pthread_mutex_lock(&coder.sim->output_mutex);
-	printf("%lld %i has taken a dongle\n",
-		(get_now_in_ms() - coder.sim->start), coder.id);
-	pthread_mutex_unlock(&coder.sim->output_mutex);
+	if (queue->head == NULL)
+		return (-1);
+	return (queue->head->coder_id);
 }
 
-void	release_dongle(t_dongle *d)
+void	pop_head(t_queue *queue)
 {
-	pthread_mutex_lock(&d->mutex);
-	d->used = 0;
-	d->available_time = get_now_in_ms() + d->cooldown_time;
-	pthread_cond_broadcast(&d->cond);
-	pthread_mutex_unlock(&d->mutex);
+	t_queue_node	*old_head;
+
+	if (!queue || !queue->head)
+		return ;
+	old_head = queue->head;
+	queue->head = old_head->next;
+	if (queue->head == NULL)
+		queue->tail = NULL;
+	free(old_head);
 }
+
+

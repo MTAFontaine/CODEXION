@@ -6,7 +6,7 @@
 /*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:24:05 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/30 15:38:30 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/31 11:57:49 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ int	main(void)
 	sim.dongle_cooldown_ms = 100;
 	sim.scheduler = 0;
 	sim.stop_flag = 0;
+	pthread_mutex_init(&sim.output_mutex, NULL);
+	pthread_mutex_init(&sim.stop_mutex, NULL);
 
 	coders = malloc(sizeof (t_coders) * sim.n_coders);
 	dongles = malloc(sizeof (*dongles) * sim.n_coders);

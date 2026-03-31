@@ -6,7 +6,7 @@
 /*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:30:52 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/30 15:58:31 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/31 12:13:24 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define CODEXION_H
 
 # include <sys/time.h>
+# include <time.h>
 # include <stdlib.h>
 # include <stdio.h>
 # include <pthread.h>
@@ -61,8 +62,9 @@ typedef struct dongle_s
 
 typedef struct coders_s
 {
-	int				id;
 	pthread_t		thread;
+	pthread_mutex_t	state_mutex;
+	int				id;
 	int				compile_count;
 	long long		last_compile;
 	t_sim			*sim;
@@ -70,24 +72,32 @@ typedef struct coders_s
 	t_dongle		*right_dongle;
 }	t_coders;
 
-void		compile(t_coders coder);
-void		debug(t_coders coder);
-void		refactor(t_coders coder);
+typedef struct monitor_s
+{
+	int			coders_finished;
+	t_dongle	*dongle_s;
+	t_coders	*coders;
+	t_sim		*sim;
+}	t_monitor;
+
+void		compile(t_coders *coder);
+void		debug(t_coders *coder);
+void		refactor(t_coders *coder);
 void		*coder_routine(void *arg);
 long long	get_now_in_ms(void);
 
 void		append_fifo(t_queue	*queue, int coder_id, long long deadline_ms);
 void		prepend_edf(t_queue *queue, int coder_id, long long deadline_ms);
-void		scheduler_enqueue(t_dongle *d, t_coders coder);
+void		scheduler_enqueue(t_dongle *d, t_coders *coder);
 void		pop_head(t_queue	*queue);
 int			peek(t_queue	*queue);
-void		get_dongle(t_dongle *d, t_coders coder);
+void		get_dongle(t_dongle *d, t_coders *coder);
 void		release_dongle(t_dongle *d);
 
 void		init_dongles(t_dongle *dongles, t_sim *sim);
 void		init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders);
 
-void		scheduler_enqueue(t_dongle *d, t_coders coder);
-
+int			is_before(long long deadline_ms, int coder_id, t_queue_node *node);
+void		set_stop_flag(t_sim sim);
 
 #endif

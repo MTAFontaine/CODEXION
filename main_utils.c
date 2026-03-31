@@ -6,7 +6,7 @@
 /*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/24 13:07:02 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/30 15:43:26 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/03/31 12:00:50 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ void	init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders)
 		coders[i].right_dongle = &dongles[(i + 1) % sim->n_coders];
 		coders[i].last_compile = sim->start;
 		pthread_create(&coders[i].thread, NULL, coder_routine, &coders[i]);
+		pthread_mutex_init(&coders[i].state_mutex, NULL);
 		i++;
 	}
 }
