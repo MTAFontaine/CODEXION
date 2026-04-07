@@ -6,11 +6,40 @@
 /*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 09:43:09 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/31 12:13:14 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/07 08:33:13 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+
+void	acquire_dongles(t_coders *coder)
+{
+	t_dongle		*first;
+	t_dongle		*second;
+
+	first = coder->left_dongle;
+	second = coder->right_dongle;
+	if (first->id > second->id)
+	{
+		first = coder->right_dongle;
+		second = coder->left_dongle;
+	}
+	if (is_sim_stopped(coder->sim))
+		return ;
+	get_dongle(first, coder);
+	if (is_sim_stopped(coder->sim))
+	{
+		release_dongle(first);
+		return ;
+	}
+	get_dongle(second, coder);
+	if (is_sim_stopped(coder->sim))
+	{
+		release_dongle(first);
+		release_dongle(second);
+		return ;
+	}
+}
 
 void	get_dongle(t_dongle *d, t_coders *coder)
 {
@@ -48,4 +77,12 @@ void	release_dongle(t_dongle *d)
 	d->available_time = get_now_in_ms() + d->cooldown_time;
 	pthread_cond_broadcast(&d->cond);
 	pthread_mutex_unlock(&d->mutex);
+}
+
+void	broadcast_all_dongles(t_dongle *dongles, int n_coders) {
+	for (int i = 0; i < n_coders; ++i) {
+		pthread_mutex_lock(&dongles[i].mutex);
+		pthread_cond_broadcast(&dongles[i].cond);
+		pthread_mutex_unlock(&dongles[i].mutex);
+	}
 }

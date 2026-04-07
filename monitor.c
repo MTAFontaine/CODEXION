@@ -3,54 +3,70 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 09:58:29 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/06 07:53:20 by marvin           ###   ########.fr       */
+/*   Updated: 2026/04/07 08:30:09 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void monitor_routine(t_monitor *ctx)
+void	has_burned_out(t_monitor *ctx, long long now, int i)
 {
-	int			i;
+	set_stop_flag(ctx->sim);
+	pthread_mutex_lock(&ctx->sim->output_mutex);
+	printf("%lld %i burned out\n",
+		now - ctx->sim->start, ctx->coders[i].id);
+	pthread_mutex_unlock(&ctx->sim->output_mutex);
+}
+
+static int	check_coder_status(t_monitor *ctx, int i)
+{
 	long long	deadline;
 	long long	now;
 
-	i = 0;
+	pthread_mutex_lock(&ctx->coders[i].state_mutex);
+	deadline = ctx->coders[i].last_compile + ctx->sim->time_to_burnout_ms;
+	if (ctx->coders[i].compile_count >= ctx->sim->number_of_compiles_required)
+		ctx->coders_finished++;
+	pthread_mutex_unlock(&ctx->coders[i].state_mutex);
+	now = get_now_in_ms();
+	if (now > deadline)
+	{
+		set_stop_flag(ctx->sim);
+		broadcast_all_dongles(ctx->dongles, ctx->sim->n_coders);
+		pthread_mutex_lock(&ctx->sim->output_mutex);
+		printf("%lld %i burned out\n", now - ctx->sim->start,
+			ctx->coders[i].id);
+		pthread_mutex_unlock(&ctx->sim->output_mutex);
+		return (1);
+	}
+	return (0);
+}
+
+void	*monitor_routine(void *arg)
+{
+	t_monitor	*ctx;
+	int			i;
+
+	ctx = (t_monitor *)arg;
 	while (1)
 	{
 		if (is_sim_stopped(ctx->sim))
-		return (NULL);
-		
+			return (NULL);
 		ctx->coders_finished = 0;
 		i = 0;
 		while (i < ctx->sim->n_coders)
 		{
-			pthread_mutex_lock(&ctx->coders[i].state_mutex);
-			deadline = (ctx->coders[i].last_compile
-					+ ctx->sim->time_to_burnout_ms);
-			if (ctx->coders[i].compile_count
-				== ctx->sim->number_of_compiles_required)
-				ctx->coders_finished += 1;
-			pthread_mutex_unlock(&ctx->coders[i].state_mutex);
-
-			now = get_now_in_ms();
-			if (now > deadline)
-			{
-				set_stop_flag(ctx->sim);
-				pthread_mutex_lock(&ctx->sim->output_mutex);
-				printf("%lld %i has burned out",
-					now - ctx->sim->start, ctx->coders[i].id);
-				pthread_mutex_unlock(&ctx->sim->output_mutex);
-			}
+			if (check_coder_status(ctx, i))
+				return (NULL);
 			i++;
 		}
 		if (ctx->coders_finished == ctx->sim->n_coders)
 		{
 			set_stop_flag(ctx->sim);
-			return(NULL);
+			return (NULL);
 		}
 		usleep(1000);
 	}
@@ -59,6 +75,7 @@ void monitor_routine(t_monitor *ctx)
 int	is_sim_stopped(t_sim *sim)
 {
 	int	stopped;
+
 	pthread_mutex_lock(&sim->stop_mutex);
 	stopped = sim->stop_flag;
 	pthread_mutex_unlock(&sim->stop_mutex);
@@ -71,3 +88,4 @@ void	set_stop_flag(t_sim *sim)
 	sim->stop_flag = 1;
 	pthread_mutex_unlock(&sim->stop_mutex);
 }
+

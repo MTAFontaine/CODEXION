@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:30:52 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/06 07:57:09 by marvin           ###   ########.fr       */
+/*   Updated: 2026/04/07 08:30:09 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <sys/time.h>
 # include <time.h>
 # include <stdlib.h>
+# include <unistd.h>
 # include <stdio.h>
 # include <pthread.h>
 
@@ -93,6 +94,7 @@ void		pop_head(t_queue	*queue);
 int			peek(t_queue	*queue);
 void		get_dongle(t_dongle *d, t_coders *coder);
 void		release_dongle(t_dongle *d);
+void		acquire_dongles(t_coders *coder);
 
 void		init_dongles(t_dongle *dongles, t_sim *sim);
 void		init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders);
@@ -100,6 +102,7 @@ void		init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders);
 int			is_before(long long deadline_ms, int coder_id, t_queue_node *node);
 void		set_stop_flag(t_sim *sim);
 int			is_sim_stopped(t_sim *sim);
-void		monitor_routine(t_monitor *ctx);
+void		*monitor_routine(void *arg);
+void		broadcast_all_dongles(t_dongle *dongles, int n_coders);
 
 #endif

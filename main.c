@@ -6,7 +6,7 @@
 /*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:24:05 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/31 11:57:49 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/07 08:20:00 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ int	main(void)
 	t_sim		sim;
 	t_coders	*coders;
 	t_dongle	*dongles;
+	t_monitor	monitor_ctx;
+	pthread_t	monitor_thread;
 
 	i = 0;
 	sim.n_coders = 5;
@@ -43,12 +45,22 @@ int	main(void)
 	init_dongles(dongles, &sim);
 	init_coders(&sim, dongles, coders);
 
+	monitor_ctx.coders_finished = 0;
+	monitor_ctx.dongles = dongles;
+	monitor_ctx.coders = coders;
+	monitor_ctx.sim = &sim;
+
+	pthread_create(&monitor_thread, NULL, monitor_routine, &monitor_ctx);
+
 	i = 0;
 	while (i < sim.n_coders)
 	{
 		pthread_join(coders[i].thread, NULL);
 		i++;
 	}
+
+	pthread_join(monitor_thread, NULL);
+
 	free(coders);
 	free(dongles);
 }
