@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:30:52 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/31 12:13:24 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/06 07:57:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ typedef struct coders_s
 typedef struct monitor_s
 {
 	int			coders_finished;
-	t_dongle	*dongle_s;
+	t_dongle	*dongles;
 	t_coders	*coders;
 	t_sim		*sim;
 }	t_monitor;
@@ -98,6 +98,8 @@ void		init_dongles(t_dongle *dongles, t_sim *sim);
 void		init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders);
 
 int			is_before(long long deadline_ms, int coder_id, t_queue_node *node);
-void		set_stop_flag(t_sim sim);
+void		set_stop_flag(t_sim *sim);
+int			is_sim_stopped(t_sim *sim);
+void		monitor_routine(t_monitor *ctx);
 
 #endif

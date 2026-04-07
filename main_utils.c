@@ -3,16 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/24 13:07:02 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/31 12:00:50 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/06 07:58:26 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 
 #include "codexion.h"
+
+void init_monitor(t_monitor ctx, t_dongle *dongles, t_coders *coders, t_sim *sim)
+{
+	ctx.coders_finished = 0;
+	ctx.dongles = dongles;
+	ctx.coders = coders;
+	ctx.sim = sim;
+}
 
 void	init_dongles(t_dongle *dongles, t_sim *sim)
 {
