@@ -17,10 +17,10 @@ static int	parse_and_populate(const char *s, int *out)
 	long long	value;
 	int			i;
 
+	i = 0;
+	value = 0;
 	if (!s || !s[0])
 		return (1);
-	value = 0;
-	i = 0;
 	while (s[i])
 	{
 		if (s[i] < '0' || s[i] > '9')
