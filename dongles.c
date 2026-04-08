@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   dongles.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 09:43:09 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/07 08:33:13 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/08 10:40:07 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void	acquire_dongles(t_coders *coder)
+int	acquire_dongles(t_coders *coder)
 {
 	t_dongle		*first;
 	t_dongle		*second;
@@ -25,31 +25,38 @@ void	acquire_dongles(t_coders *coder)
 		second = coder->left_dongle;
 	}
 	if (is_sim_stopped(coder->sim))
-		return ;
-	get_dongle(first, coder);
+		return (0);
+	if (!get_dongle(first, coder))
+		return (0);
 	if (is_sim_stopped(coder->sim))
 	{
 		release_dongle(first);
-		return ;
+		return (0);
 	}
-	get_dongle(second, coder);
+	if (!get_dongle(second, coder))
+	{
+		release_dongle(first);
+		return (0);
+	}
 	if (is_sim_stopped(coder->sim))
 	{
 		release_dongle(first);
 		release_dongle(second);
-		return ;
+		return (0);
 	}
+	return (1);
 }
 
-void	get_dongle(t_dongle *d, t_coders *coder)
+int	get_dongle(t_dongle *d, t_coders *coder)
 {
 	long long		now;
 	struct timespec	ts;
 
 	pthread_mutex_lock(&d->mutex);
 	scheduler_enqueue(d, coder);
-	while (d->used || peek(&d->queue) != coder->id
-		|| d->available_time > get_now_in_ms())
+	while (!is_sim_stopped(coder->sim)
+		&& (d->used || peek(&d->queue) != coder->id
+		|| d->available_time > get_now_in_ms()))
 	{
 		now = get_now_in_ms();
 		if (!d->used && peek(&d->queue) == coder->id && d->available_time > now)
@@ -61,6 +68,11 @@ void	get_dongle(t_dongle *d, t_coders *coder)
 		else
 			pthread_cond_wait(&d->cond, &d->mutex);
 	}
+	if (is_sim_stopped(coder->sim))
+	{
+		pthread_mutex_unlock(&d->mutex);
+		return (0);
+	}
 	d->used = 1;
 	pop_head(&d->queue);
 	pthread_mutex_unlock(&d->mutex);
@@ -68,6 +80,7 @@ void	get_dongle(t_dongle *d, t_coders *coder)
 	printf("%lld %i has taken a dongle\n",
 		(get_now_in_ms() - coder->sim->start), coder->id);
 	pthread_mutex_unlock(&coder->sim->output_mutex);
+	return (1);
 }
 
 void	release_dongle(t_dongle *d)

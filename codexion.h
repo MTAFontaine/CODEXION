@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:30:52 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/07 08:30:09 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/08 12:02:24 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
+# include <string.h>
 # include <pthread.h>
 
 typedef struct queue_node_s
@@ -29,8 +30,8 @@ typedef struct queue_node_s
 
 typedef struct queue_s
 {
-	t_queue_node	*head; // The front of the queue (the first one to ask)
-	t_queue_node	*tail; // The back of the queue (the last one to ask)
+	t_queue_node	*head;
+	t_queue_node	*tail;
 }	t_queue;
 
 typedef struct sim_s
@@ -81,28 +82,52 @@ typedef struct monitor_s
 	t_sim		*sim;
 }	t_monitor;
 
-void		compile(t_coders *coder);
-void		debug(t_coders *coder);
-void		refactor(t_coders *coder);
-void		*coder_routine(void *arg);
-long long	get_now_in_ms(void);
 
-void		append_fifo(t_queue	*queue, int coder_id, long long deadline_ms);
-void		prepend_edf(t_queue *queue, int coder_id, long long deadline_ms);
-void		scheduler_enqueue(t_dongle *d, t_coders *coder);
-void		pop_head(t_queue	*queue);
-int			peek(t_queue	*queue);
-void		get_dongle(t_dongle *d, t_coders *coder);
-void		release_dongle(t_dongle *d);
-void		acquire_dongles(t_coders *coder);
+// ARGUMENTS VALIDATION //
+
+int	validate_arguments(int argc, char *argv[], t_sim *sim);
+
+// INITIALIZATION //
 
 void		init_dongles(t_dongle *dongles, t_sim *sim);
 void		init_coders(t_sim *sim, t_dongle *dongles, t_coders *coders);
+void		init_monitor(t_monitor *ctx, t_dongle *dongles, t_coders *coders, t_sim *sim);
 
+// QUEUE MANAGEMENT //
+
+void		scheduler_enqueue(t_dongle *d, t_coders *coder);
+void		append_fifo(t_queue	*queue, int coder_id, long long deadline_ms);
+void		prepend_edf(t_queue *queue, int coder_id, long long deadline_ms);
 int			is_before(long long deadline_ms, int coder_id, t_queue_node *node);
-void		set_stop_flag(t_sim *sim);
-int			is_sim_stopped(t_sim *sim);
+void		pop_head(t_queue	*queue);
+int			peek(t_queue	*queue);
+
+// CODER ROUTINE //
+
+void		*coder_routine(void *arg);
+void		compile(t_coders *coder);
+void		debug(t_coders *coder);
+void		refactor(t_coders *coder);
+long long	get_now_in_ms(void);
+
+// DONGLES MANAGEMENT //
+
+int			get_dongle(t_dongle *d, t_coders *coder);
+void		release_dongle(t_dongle *d);
+int			acquire_dongles(t_coders *coder);
+
+// MONITOR MANAGEMENT //
+
 void		*monitor_routine(void *arg);
+int			check_coder_status(t_monitor *ctx, int i);
+int			is_sim_stopped(t_sim *sim);
+void		set_stop_flag(t_sim *sim);
 void		broadcast_all_dongles(t_dongle *dongles, int n_coders);
+
+// CLEAN-UP //
+
+void	cleanup_queues(t_dongle *all_dongles, int count);
+void	cleanup_mutexes(t_sim *sim, t_coders *coders, t_dongle *dongles);
+void	clear_queue(t_queue *queue);
 
 #endif

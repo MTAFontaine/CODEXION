@@ -3,14 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   coder_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 11:37:53 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/07 08:31:32 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/08 12:10:13 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+
+static void	sleep_interruptible(t_sim *sim, long long duration_ms)
+{
+	long long	start;
+	long long	now;
+
+	start = get_now_in_ms();
+	while (!is_sim_stopped(sim))
+	{
+		now = get_now_in_ms();
+		if (now - start >= duration_ms)
+			break ;
+		usleep(500);
+	}
+}
 
 long long	get_now_in_ms(void)
 {
@@ -32,19 +47,15 @@ void	*coder_routine(void *arg)
 	while (!is_sim_stopped(coder->sim)
 		&& coder->compile_count < coder->sim->number_of_compiles_required)
 	{
-		if (is_sim_stopped(coder->sim))
-			break;
 		compile(coder);
 		if (is_sim_stopped(coder->sim))
-			break;
+			break ;
 		pthread_mutex_lock(&coder->state_mutex);
 		coder->compile_count += 1;
 		pthread_mutex_unlock(&coder->state_mutex);
-		if (is_sim_stopped(coder->sim))
-			break;
 		debug(coder);
 		if (is_sim_stopped(coder->sim))
-			break;
+			break ;
 		refactor(coder);
 	}
 	return (NULL);
@@ -58,49 +69,44 @@ void	compile(t_coders *coder)
 
 	first = coder->left_dongle;
 	second = coder->right_dongle;
-	acquire_dongles(coder);
 	t_compile = coder->sim->time_to_compile_ms;
+	if (!acquire_dongles(coder))
+		return ;
 	coder->last_compile = get_now_in_ms();
 	pthread_mutex_lock(&coder->sim->output_mutex);
 	printf("%lld %i is compiling\n",
 		(get_now_in_ms() - coder->sim->start), coder->id);
 	pthread_mutex_unlock(&coder->sim->output_mutex);
-	usleep(t_compile * 1000);
+	sleep_interruptible(coder->sim, t_compile);
 	release_dongle(second);
 	release_dongle(first);
 }
 
 void	refactor(t_coders *coder)
 {
-	long long	ms_now;
-	long long	target;
 	long long	t_refactor;
 
+	if (is_sim_stopped(coder->sim))
+		return ;
 	t_refactor = coder->sim->time_to_refactor_ms;
-	ms_now = get_now_in_ms();
-	target = ms_now + t_refactor;
 
 	pthread_mutex_lock(&coder->sim->output_mutex);
 	printf("%lld %d is refactoring\n",
 		(get_now_in_ms() - coder->sim->start), coder->id);
 	pthread_mutex_unlock(&coder->sim->output_mutex);
-	if (!is_sim_stopped(coder->sim))
-		usleep(t_refactor * 1000);
+	sleep_interruptible(coder->sim, t_refactor);
 }
 
 void	debug(t_coders *coder)
 {
-	long long	ms_now;
-	long long	target;
 	long long	t_debug;
 
+	if (is_sim_stopped(coder->sim))
+		return ;
 	t_debug = coder->sim->time_to_debug_ms;
-	ms_now = get_now_in_ms();
-	target = ms_now + t_debug;
 	pthread_mutex_lock(&coder->sim->output_mutex);
 	printf("%lld %d is debugging\n",
 		(get_now_in_ms() - coder->sim->start), coder->id);
 	pthread_mutex_unlock(&coder->sim->output_mutex);
-	if (!is_sim_stopped(coder->sim))
-		usleep(t_debug * 1000);
+	sleep_interruptible(coder->sim, t_debug);
 }

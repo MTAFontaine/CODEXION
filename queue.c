@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   queue.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 13:55:45 by mafontai          #+#    #+#             */
-/*   Updated: 2026/03/31 09:45:42 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/08 10:48:59 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,5 +83,7 @@ void	pop_head(t_queue *queue)
 		queue->tail = NULL;
 	free(old_head);
 }
+
+
 
 

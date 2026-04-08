@@ -3,25 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 09:58:29 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/07 08:30:09 by mafontai         ###   ########.fr       */
+/*   Updated: 2026/04/08 10:54:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void	has_burned_out(t_monitor *ctx, long long now, int i)
-{
-	set_stop_flag(ctx->sim);
-	pthread_mutex_lock(&ctx->sim->output_mutex);
-	printf("%lld %i burned out\n",
-		now - ctx->sim->start, ctx->coders[i].id);
-	pthread_mutex_unlock(&ctx->sim->output_mutex);
-}
-
-static int	check_coder_status(t_monitor *ctx, int i)
+int	check_coder_status(t_monitor *ctx, int i)
 {
 	long long	deadline;
 	long long	now;
