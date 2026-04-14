@@ -3,18 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/24 13:07:02 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/08 12:08:20 by marvin           ###   ########.fr       */
+/*   Updated: 2026/04/14 08:11:49 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
 #include "codexion.h"
 
-void init_monitor(t_monitor *ctx, t_dongle *dongles, t_coders *coders, t_sim *sim)
+void	init_monitor(t_monitor *ctx, t_dongle *dongles,
+						t_coders *coders, t_sim *sim)
 {
 	ctx->coders_finished = 0;
 	ctx->dongles = dongles;
@@ -25,7 +24,7 @@ void init_monitor(t_monitor *ctx, t_dongle *dongles, t_coders *coders, t_sim *si
 void	init_dongles(t_dongle *dongles, t_sim *sim)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < sim->n_coders)
 	{

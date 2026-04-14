@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   queue.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 13:55:45 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/08 10:48:59 by marvin           ###   ########.fr       */
+/*   Updated: 2026/04/14 08:12:09 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void	append_fifo(t_queue	*queue, int coder_id, long long deadline_ms)
 	new_node->coder_id = coder_id;
 	new_node->deadline_ms = deadline_ms;
 	new_node->next = NULL;
-
 	if (queue->tail == NULL)
 	{
 		queue->head = new_node;
@@ -83,7 +82,3 @@ void	pop_head(t_queue *queue)
 		queue->tail = NULL;
 	free(old_head);
 }
-
-
-
-

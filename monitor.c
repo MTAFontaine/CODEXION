@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mafontai <mafontai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/31 09:58:29 by mafontai          #+#    #+#             */
-/*   Updated: 2026/04/08 10:54:09 by marvin           ###   ########.fr       */
+/*   Updated: 2026/04/14 08:28:53 by mafontai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,3 +80,12 @@ void	set_stop_flag(t_sim *sim)
 	pthread_mutex_unlock(&sim->stop_mutex);
 }
 
+long long	get_now_in_ms(void)
+{
+	long long		ms_now;
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	ms_now = (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	return (ms_now);
+}

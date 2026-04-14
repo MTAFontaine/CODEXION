@@ -7,7 +7,7 @@ SRCS = main.c\
 parsing.c\
 main_utils.c\
 queue.c\
-coder_utils.c\
+coder.c\
 queue_utils.c\
 dongles.c\
 monitor.c\
