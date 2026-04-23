@@ -62,11 +62,17 @@ void	compile(t_coders *coder)
 	t_compile = coder->sim->time_to_compile_ms;
 	if (!acquire_dongles(coder))
 		return ;
+
+	// Lock state_mutex before modifying last_compile
+	pthread_mutex_lock(&coder->state_mutex);
 	coder->last_compile = get_now_in_ms();
+	pthread_mutex_unlock(&coder->state_mutex);
+
 	pthread_mutex_lock(&coder->sim->output_mutex);
 	printf("%lld %i is compiling\n",
 		(get_now_in_ms() - coder->sim->start), coder->id);
 	pthread_mutex_unlock(&coder->sim->output_mutex);
+
 	sleep_interruptible(coder->sim, t_compile);
 	release_dongle(second);
 	release_dongle(first);

@@ -1,6 +1,6 @@
 NAME = codexion
 CC = cc 
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread 
 BIN_DIR = bin
 
 SRCS = main.c\

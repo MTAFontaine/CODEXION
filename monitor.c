@@ -56,7 +56,9 @@ void	*monitor_routine(void *arg)
 		}
 		if (ctx->coders_finished == ctx->sim->n_coders)
 		{
+			pthread_mutex_lock(&ctx->sim->stop_mutex);
 			set_stop_flag(ctx->sim);
+			pthread_mutex_unlock(&ctx->sim->stop_mutex);
 			return (NULL);
 		}
 		usleep(1000);
